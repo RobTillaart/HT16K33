@@ -1,7 +1,7 @@
 //
 //    FILE: 4x7segmentI2C.ino
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.0.1
+// VERSION: 0.0.2
 // PURPOSE: demo 2
 //     URL: http://www.adafruit.com/products/1002
 //     URL: https://github.com/RobTillaart/HT16K33
@@ -139,3 +139,6 @@ void loop()
   seg.suppressLeadingZeroPlaces(0);
   Serial.println("\n -- DONE -- \n");
 }
+
+
+// -- END OF FILE --
