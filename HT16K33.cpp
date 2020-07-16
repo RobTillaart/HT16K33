@@ -1,7 +1,7 @@
 //
 //    FILE: HT16K33.cpp
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.2.0
+// VERSION: 0.2.1
 //    DATE: 2019-02-07
 // PURPOSE: Arduino Library for HT16K33 4x7segment display
 //     URL: https://github.com/RobTillaart/HT16K33
@@ -14,7 +14,7 @@
 // 0.1.4   2019-11-28 added displayRaw(), displayVULeft(), displayVURight()
 // 0.1.5   2019-11-30 refactor,
 // 0.2.0   2020-06-13 ESP32 support; fix brightness bug;
-//
+// 0.2.1   2020-07-15 fix #160 - decimal point
 
 #include "HT16K33.h"
 
@@ -193,14 +193,16 @@ void HT16K33::displayTime(uint8_t left, uint8_t right)
 // TODO x.yEz
 void HT16K33::displayFloat(float f)
 {
-  int pt = 0;
   // uint8_t neg = 0;
   // if (f < 0) { neg = -1; f = -f; }
   if (f > 9999 || f < 0 ) return;
-  int w = round(f);
-  if (w > 9) pt = 1;
-  if (w > 99) pt = 2;
-  if (w > 999) pt = 3;
+  int w = f;
+
+  int pt = 3;
+  if (w < 1000) pt = 2; 
+  if (w < 100) pt = 1; 
+  if (w < 10) pt = 0;
+
   if (f >= 1)
   {
     while (f < 1000) f *= 10;
@@ -300,6 +302,14 @@ void HT16K33::display(uint8_t *arr)
 
 void HT16K33::display(uint8_t *arr, uint8_t pnt)
 {
+  // to debug without display
+  // Serial.print(arr[0]);
+  // Serial.print(arr[1]);
+  // Serial.print(arr[2]);
+  // Serial.print(arr[3]);
+  // Serial.print(" ");
+  // Serial.println(pnt);
+
   writePos(0, charmap[arr[0]], pnt == 0);
   writePos(1, charmap[arr[1]], pnt == 1);
   writePos(3, charmap[arr[2]], pnt == 2);

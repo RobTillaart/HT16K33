@@ -1,7 +1,7 @@
 //
 //    FILE: 4x7segmentI2C.ino
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.0.1
+// VERSION: 0.0.2
 // PURPOSE: demo
 //     URL: http://www.adafruit.com/products/1002
 //     URL: https://github.com/RobTillaart/HT16K33
@@ -127,3 +127,5 @@ void loop()
   stop = millis();
   Serial.println(stop - start);
 }
+
+// -- END OF FILE --
