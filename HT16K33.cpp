@@ -1,7 +1,7 @@
 //
 //    FILE: HT16K33.cpp
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.2.1
+// VERSION: 0.2.2
 //    DATE: 2019-02-07
 // PURPOSE: Arduino Library for HT16K33 4x7segment display
 //     URL: https://github.com/RobTillaart/HT16K33
@@ -15,6 +15,7 @@
 // 0.1.5   2019-11-30 refactor,
 // 0.2.0   2020-06-13 ESP32 support; fix brightness bug;
 // 0.2.1   2020-07-15 fix #160 - decimal point
+// 0.2.2   2020-10-04 added displayDate() thanks to bepitama)
 
 #include "HT16K33.h"
 
@@ -174,6 +175,18 @@ void HT16K33::displayHex(uint16_t n)
   x[1] = h & 0x0F;;
   x[0] = h >> 4;
   display(x);
+}
+
+// 00.00 .. 99.99
+void HT16K33::displayDate(uint8_t left, uint8_t right)
+{
+  uint8_t x[4];
+  x[0] = left / 10;
+  x[1] = left - x[0] * 10;
+  x[2] = right / 10;
+  x[3] = right - x[2] * 10;
+  display(x, 1);
+  displayColon(false);
 }
 
 // 00:00 .. 99:99
