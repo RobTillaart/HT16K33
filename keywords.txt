@@ -16,6 +16,7 @@ suppressLeadingZeroPlaces	KEYWORD2
 displayClear	KEYWORD2
 displayInt	KEYWORD2
 displayHex	KEYWORD2
+displayDate	KEYWORD2
 displayTime	KEYWORD2
 displayFloat	KEYWORD2
 display	KEYWORD2

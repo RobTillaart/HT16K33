@@ -1,7 +1,7 @@
 //
 //    FILE: 4x7segmentI2C.ino
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.0.2
+// VERSION: 0.0.3
 // PURPOSE: demo 2
 //     URL: http://www.adafruit.com/products/1002
 //     URL: https://github.com/RobTillaart/HT16K33
@@ -59,6 +59,26 @@ void loop()
   delay(1000);
 
   Serial.println("displayTime()");
+  seg.displayTime(13, 25);
+  for (int i = 50; i < 60; i++)
+  {
+    seg.displayTime(13, i);
+    delay(500);
+    seg.displayColon(true);
+    delay(500);
+  }
+  
+  Serial.println("displayDate()");
+  uint8_t dpm[12] = { 31, 28, 31, 30,   31, 30, 31, 31,   30, 32, 30, 31 };
+  for (uint8_t mo = 0; mo < 12; mo++)
+  {
+    for (uint8_t da = 1; da <= dpm[mo]; da++)
+    {
+      seg.displayDate(mo + 1, da);
+      delay(100);
+    }
+  }
+  
   seg.displayTime(13, 25);
   for (int i = 50; i < 60; i++)
   {
