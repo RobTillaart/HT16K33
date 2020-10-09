@@ -2,7 +2,7 @@
 //
 //    FILE: HT16K33.h
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.2.2
+// VERSION: 0.2.3
 //    DATE: 2019-02-07
 // PURPOSE: Arduino Library for HT16K33 4x7segment display
 //          http://www.adafruit.com/products/1002
@@ -12,7 +12,7 @@
 #include "Arduino.h"
 #include "Wire.h"
 
-#define HT16K33_LIB_VERSION "0.2.2"
+#define HT16K33_LIB_VERSION "0.2.3"
 
 class HT16K33
 {
@@ -54,6 +54,8 @@ public:
   void displayRaw(uint8_t *arr);            // max control
   void displayVULeft(uint8_t val);          // 0..8
   void displayVURight(uint8_t val);         // 0..8
+
+  void dumpSerial(uint8_t *arr, uint8_t pnt);  // debugging purpose
 
 private:
 
