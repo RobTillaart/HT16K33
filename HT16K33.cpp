@@ -1,7 +1,7 @@
 //
 //    FILE: HT16K33.cpp
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.2.2
+// VERSION: 0.2.3
 //    DATE: 2019-02-07
 // PURPOSE: Arduino Library for HT16K33 4x7segment display
 //     URL: https://github.com/RobTillaart/HT16K33
@@ -15,7 +15,8 @@
 // 0.1.5   2019-11-30 refactor,
 // 0.2.0   2020-06-13 ESP32 support; fix brightness bug;
 // 0.2.1   2020-07-15 fix #160 - decimal point
-// 0.2.2   2020-10-04 added displayDate() thanks to bepitama)
+// 0.2.2   2020-10-04 added displayDate() thanks to bepitama
+// 0.2.3   2020-10-09 issue #4 add negative values for displayInt()
 
 #include "HT16K33.h"
 
@@ -149,18 +150,35 @@ void HT16K33::displayClear()
   displayColon(false);
 }
 
-// 0000..9999
-// TODO negative numbers
+// -999..9999
 // DIV10 & DIV100 optimize?
 void HT16K33::displayInt(int n)
 {
   uint8_t x[4], h, l;
+  bool neg = (n < 0);
+  if (neg) n = -n;
   h = n / 100;
   l = n - h * 100;
   x[0] = h / 10;
   x[1] = h - x[0] * 10;
   x[2] = l / 10;
   x[3] = l - x[2] * 10;
+  
+  if (neg)
+  {
+    if (_leadingZeroPlaces > 0)
+    {
+      int i = 0;             // N == 3 DIGITS
+      if (n < 100) i = 1;    // N == 2 DIGITS
+      if (n < 10)  i = 2;    // N == 1 DIGIT
+      x[i] = HT16K33_MINUS;
+      while(--i >= 0) x[i] = HT16K33_SPACE;
+    }
+    else
+    {
+      x[0] = HT16K33_MINUS;
+    }
+  }
   display(x);
 }
 
@@ -311,17 +329,15 @@ void HT16K33::display(uint8_t *arr)
   writePos(1, charmap[arr[1]]);
   writePos(3, charmap[arr[2]]);
   writePos(4, charmap[arr[3]]);
+
+  // debug to Serial
+  // dumpSerial(arr, 0);
 }
 
 void HT16K33::display(uint8_t *arr, uint8_t pnt)
 {
-  // to debug without display
-  // Serial.print(arr[0]);
-  // Serial.print(arr[1]);
-  // Serial.print(arr[2]);
-  // Serial.print(arr[3]);
-  // Serial.print(" ");
-  // Serial.println(pnt);
+  // debug to Serial
+  // dumpSerial(arr, pnt);
 
   writePos(0, charmap[arr[0]], pnt == 0);
   writePos(1, charmap[arr[1]], pnt == 1);
@@ -332,6 +348,19 @@ void HT16K33::display(uint8_t *arr, uint8_t pnt)
 void HT16K33::displayColon(uint8_t on)
 {
   writePos(2, on ? 2 : 0);
+}
+
+void HT16K33::dumpSerial(uint8_t *arr, uint8_t pnt)
+{
+  // to debug without display
+  for (int i = 0; i < 4; i++)
+  {
+    if (arr[i] == HT16K33_SPACE) Serial.print(" ");
+    else if (arr[i] == HT16K33_MINUS) Serial.print("-");
+    else Serial.print(arr[i]);
+  }
+  Serial.print(" ");
+  Serial.println(pnt);
 }
 
 //////////////////////////////////////////////////////////
