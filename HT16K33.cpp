@@ -1,7 +1,7 @@
 //
 //    FILE: HT16K33.cpp
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.2.3
+// VERSION: 0.2.4
 //    DATE: 2019-02-07
 // PURPOSE: Arduino Library for HT16K33 4x7segment display
 //     URL: https://github.com/RobTillaart/HT16K33
@@ -17,6 +17,7 @@
 // 0.2.1   2020-07-15 fix #160 - decimal point
 // 0.2.2   2020-10-04 added displayDate() thanks to bepitama
 // 0.2.3   2020-10-09 issue #4 add negative values for displayInt()
+// 0.2.4   2020-10-10 refactor #5 setDigits() iso suppressLeadingZeroPlaces()
 
 #include "HT16K33.h"
 
@@ -99,7 +100,7 @@ void HT16K33::reset()
 {
   displayOn();
   displayClear();
-  suppressLeadingZeroPlaces(3);
+  setDigits(1);    
   for (uint8_t i = 0; i < 5; i++)
   {
     _displayCache[i] = HT16K33_NONE;
@@ -135,10 +136,16 @@ void HT16K33::brightness(uint8_t val)
   writeCmd(HT16K33_BRIGHTNESS | _bright);
 }
 
+void HT16K33::setDigits(uint8_t val)
+{
+  _digits = val > 4 ? 4 : val;
+}
+
 void HT16K33::suppressLeadingZeroPlaces(uint8_t val)
 {
-  _leadingZeroPlaces = val > 4 ? 4 : val;
+  _digits = val > 4 ? 0 : 4 - val;
 }
+
 //////////////////////////////////////////
 //
 // display functions
@@ -166,17 +173,19 @@ void HT16K33::displayInt(int n)
   
   if (neg)
   {
-    if (_leadingZeroPlaces > 0)
+    if (_digits >= 3)
     {
-      int i = 0;             // N == 3 DIGITS
-      if (n < 100) i = 1;    // N == 2 DIGITS
-      if (n < 10)  i = 2;    // N == 1 DIGIT
-      x[i] = HT16K33_MINUS;
-      while(--i >= 0) x[i] = HT16K33_SPACE;
+      x[0] = HT16K33_MINUS;
     }
     else
     {
-      x[0] = HT16K33_MINUS;
+      int i = 0;
+      for (i = 0; i < (4 - _digits); i++)
+      {
+        if (x[i] != 0) break;
+        x[i] = HT16K33_SPACE;
+      }
+      x[i-1] = HT16K33_MINUS;
     }
   }
   display(x);
@@ -317,13 +326,10 @@ void HT16K33::displayVURight(uint8_t val)
 
 void HT16K33::display(uint8_t *arr)
 {
-  if (_leadingZeroPlaces)
+  for (uint8_t i = 0; i < (4 - _digits); i++)
   {
-    for (uint8_t i = 0; i < _leadingZeroPlaces; i++)
-    {
-      if (arr[i] != 0) break;
-      arr[i] = HT16K33_SPACE;
-    }
+    if (arr[i] != 0) break;
+    arr[i] = HT16K33_SPACE;
   }
   writePos(0, charmap[arr[0]]);
   writePos(1, charmap[arr[1]]);

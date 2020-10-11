@@ -2,7 +2,7 @@
 //
 //    FILE: HT16K33.h
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.2.3
+// VERSION: 0.2.4
 //    DATE: 2019-02-07
 // PURPOSE: Arduino Library for HT16K33 4x7segment display
 //          http://www.adafruit.com/products/1002
@@ -12,7 +12,7 @@
 #include "Arduino.h"
 #include "Wire.h"
 
-#define HT16K33_LIB_VERSION "0.2.3"
+#define HT16K33_LIB_VERSION "0.2.4"
 
 class HT16K33
 {
@@ -31,11 +31,14 @@ public:
   void brightness(uint8_t val);             // 0 .. 15
   void blink(uint8_t val);                  // 0 .. 3     0 = off
 
+  // 0,1,2,3,4 digits - will replace suppressLeadingZeroPlaces
+  void setDigits(uint8_t val);
+  
   // 0 = off, 1,2,3,4 digits  space iso 0
-  void suppressLeadingZeroPlaces(uint8_t val);
+  void suppressLeadingZeroPlaces(uint8_t val);    // will be obsolete
 
   void displayClear();
-  void displayInt(int n);                   // 0000 .. 9999
+  void displayInt(int n);                   // -999 .. 9999
   void displayHex(uint16_t n);              // 0000 .. FFFF
 
   // Date could be {month.day} or {day.hour}           . as separator
@@ -65,7 +68,7 @@ private:
 
   uint8_t _addr;
   uint8_t _displayCache[5];                 // for performance
-  uint8_t _leadingZeroPlaces;
+  uint8_t _digits = 0;
   uint8_t _bright;
 };
 
