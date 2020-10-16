@@ -1,19 +1,18 @@
 //
-//    FILE: 4x7segmentI2C.ino
+//    FILE: demo_VU.ino
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.0.2
-// PURPOSE: demo 3
+// VERSION: 0.1.0
+// PURPOSE: demo
 //     URL: http://www.adafruit.com/products/1002
 //     URL: https://github.com/RobTillaart/HT16K33
 
+// connect potmeter or so to A0 and A1 for the VU tests
+
 #include "HT16K33.h"
 
-HT16K33 seg(0x70);
-
-uint32_t start;
-uint32_t stop;
-
-uint8_t ar[4];
+HT16K33  seg(0x70);
+uint32_t start, stop;
+uint8_t  ar[4];
 
 void setup()
 {
@@ -24,7 +23,7 @@ void setup()
   Wire.setClock(100000);
 
   seg.displayOn();
-  seg.suppressLeadingZeroPlaces(0);
+  seg.setDigits(4);
 
   Serial.println("displayTest()");
   seg.displayTest(10);
@@ -36,56 +35,44 @@ void setup()
 
 void loop()
 {
-  // comment tests you do not want to see
-  test_elsa();
-  delay(100);
-  test_random();
-  delay(100);
   test_VULeft();
-  delay(100);
+  delay(1000);
   test_VURight();
-  delay(100);
+  delay(1000);
   test_VUStereo();
-  delay(100);
-}
-
-void test_elsa()
-{
-  ar[0] = 0x79;
-  ar[1] = 0x38;
-  ar[2] = 0x6D;
-  ar[3] = 0x77;
-  seg.displayRaw(ar);
-}
-
-void test_random()
-{
-  for (uint8_t i = 0; i < 4; i++)
-  {
-    ar[i] = random(256);
-  }
-  seg.displayRaw(ar);
+  delay(1000);
 }
 
 void test_VULeft()
 {
-  int val = analogRead(A0);
-  val = val / 120;  // 0..8
-  seg.displayVULeft(val);
+  for (uint8_t run = 0; run < 50; run++)
+  {
+    int val = abs((sin(run * PI/ 50)) * 8);
+    seg.displayVULeft(val);
+    delay(100);
+  }
 }
 
 void test_VURight()
 {
-  int val = analogRead(A0);
-  val = val / 120;  // 0..8
-  seg.displayVURight(val);
+  for (uint8_t run = 0; run < 50; run++)
+  {
+    int val = analogRead(A0);
+    val = val / 120;  // 0..8
+    seg.displayVURight(val);
+    delay(100);
+  }
 }
 
 void test_VUStereo()
 {
-  uint8_t left = analogRead(A0) / 240;   // 0..4
-  uint8_t right = analogRead(A1) / 240;  // 0..4
-  displayVUStereo(left, right);
+  for (uint8_t run = 0; run < 50; run++)
+  {
+    uint8_t left = analogRead(A0) / 240;   // 0..4
+    uint8_t right = analogRead(A1) / 240;  // 0..4
+    displayVUStereo(left, right);
+    delay(100);
+  }
 }
 
 void displayVUStereo(uint8_t left, uint8_t right)
@@ -141,9 +128,9 @@ void displayVUStereo(uint8_t left, uint8_t right)
   seg.displayRaw(ar);
 
   // sort of heartbeat
-  static bool t = false;
-  seg.displayColon(t);
-  t = !t;
+  static bool hb = false;
+  seg.displayColon(hb);
+  hb = !hb;
 }
 
 // -- END OF FILE --
