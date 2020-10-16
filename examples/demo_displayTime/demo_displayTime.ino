@@ -1,7 +1,7 @@
 //
 //    FILE: demo_displayTime.ino
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.1.0
+// VERSION: 0.2.0
 // PURPOSE: demo
 //     URL: http://www.adafruit.com/products/1002
 //     URL: https://github.com/RobTillaart/HT16K33
@@ -21,7 +21,7 @@ void setup()
   seg.begin();
   Wire.setClock(100000);
   seg.displayOn();
-  seg.suppressLeadingZeroPlaces(0);
+  seg.setDigits(4);
 }
 
 void loop()
