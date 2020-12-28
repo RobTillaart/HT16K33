@@ -1,24 +1,25 @@
 //
 //    FILE: HT16K33.cpp
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.3.0
+// VERSION: 0.3.1
 //    DATE: 2019-02-07
 // PURPOSE: Arduino Library for HT16K33 4x7segment display
 //     URL: https://github.com/RobTillaart/HT16K33
 //
-// HISTORY:
-// 0.1.0   2019-02-07 initial version
-// 0.1.1   2019-02-07 first stable version
-// 0.1.2   2019-02-11 optimized performance
-// 0.1.3   2019-10-07 fixed clear, added suppressLeadingZeroPlaces();
-// 0.1.4   2019-11-28 added displayRaw(), displayVULeft(), displayVURight()
-// 0.1.5   2019-11-30 refactor,
-// 0.2.0   2020-06-13 ESP32 support; fix brightness bug;
-// 0.2.1   2020-07-15 fix #160 - decimal point
-// 0.2.2   2020-10-04 added displayDate() thanks to bepitama
-// 0.2.3   2020-10-09 issue #4 add negative values for displayInt()
-// 0.2.4   2020-10-10 refactor #5 setDigits() iso suppressLeadingZeroPlaces()
-// 0.3.0   2020-10-12 negative float, cache control, extend displayRaw()
+//  HISTORY:
+//  0.1.0   2019-02-07  initial version
+//  0.1.1   2019-02-07  first stable version
+//  0.1.2   2019-02-11  optimized performance
+//  0.1.3   2019-10-07  fixed clear, added suppressLeadingZeroPlaces();
+//  0.1.4   2019-11-28  added displayRaw(), displayVULeft(), displayVURight()
+//  0.1.5   2019-11-30  refactor,
+//  0.2.0   2020-06-13  ESP32 support; fix brightness bug;
+//  0.2.1   2020-07-15  fix #160 - decimal point
+//  0.2.2   2020-10-04  added displayDate() thanks to bepitama
+//  0.2.3   2020-10-09  issue #4 add negative values for displayInt()
+//  0.2.4   2020-10-10  refactor #5 setDigits() iso suppressLeadingZeroPlaces()
+//  0.3.0   2020-10-12  negative float, cache control, extend displayRaw()
+//  0.3.1   2020-12-28  arduino-CI, unit test (framework only), 
 
 #include "HT16K33.h"
 
