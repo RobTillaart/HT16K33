@@ -1,3 +1,9 @@
+
+[![Arduino CI](https://github.com/RobTillaart/HT16K33/workflows/Arduino%20CI/badge.svg)](https://github.com/marketplace/actions/arduino_ci)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)](https://github.com/RobTillaart/HT16K33/blob/master/LICENSE)
+[![GitHub release](https://img.shields.io/github/release/RobTillaart/HT16K33.svg?maxAge=3600)](https://github.com/RobTillaart/HT16K33/releases)
+
+
 # HT16K33
 
 Arduino Library for HT16K33 I2C 4x7segment display
@@ -11,8 +17,6 @@ This library is functionally less capable than Adafruits.
 However as it caches the values written to the display per position 
 it is faster for writing on average. The actual gain depends on the
 application and of course the values. 
-
-
 
 ## Perfomance 
 
@@ -45,7 +49,8 @@ get leading/railing zero's correctly.
 
 ## Interface
 
-#### setup behaviour
+### Setup behaviour
+
 - **HT16K33(address)** address is 0x70..0x77 depending on the jumpers A0..A2. **0x70** is default
 - **void begin(sda, scl)** for ESP32, select I2C pins, initialize I2C and calls **reset()**
 - **void begin()** initialize I2C and calls **reset()**
@@ -60,7 +65,8 @@ get leading/railing zero's correctly.
 - **void setDigits(val)** values 0..4, minimal number of digits shown, mandatory for large numbers on dual display.
 - **void suppressLeadingZeroPlaces(val)** obsolete, replaced by setDigits
 
-#### datatypes
+### Datatypes
+
 - **void displayClear()** empty display
 - **void displayInt(n)** values -999 .. 9999
 - **void displayHex(n)** values 0000 .. FFFF
@@ -68,17 +74,20 @@ get leading/railing zero's correctly.
 - **void displayTime(left, right)** values 00:00..99:99 Time could be hh:mm or mm:ss or ss:uu (hundreds)  : as separator
 - **void displayFloat(f)** values -999..0.000..9999, no overflow indication!
 
-#### special
+### Special
+
 - **void displayVULeft(val)** display used as sort VU meter, values 0..8
 - **void displayVURight(val)** display used as sort VU meter, values 0..8
 
-#### lower level workers
+### Lower level workers
+
 - **void display(uint8_t \*arr)** array of 4 bytes to control one 7seg display
 - **void display(uint8_t \*arr, uint8_t pt)** idem + pt = position of the digit with point (0..3)
 - **void displayColon(on)** 0 = off, all values other are on.
 - **void displayRaw(uint8_t \*arr, colon)** array of 4 bytes to control one 7seg display + colon flag
 
-#### debugging 
+### Debugging
+
 - **void displayTest(uint8_t del)** debugging / test function
 - **void dumpSerial(uint8_t \*arr, uint8_t pt)** debugging equivalent of display.
 
