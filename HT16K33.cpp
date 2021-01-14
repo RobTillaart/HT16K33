@@ -1,7 +1,7 @@
 //
 //    FILE: HT16K33.cpp
 //  AUTHOR: Rob Tillaart
-// VERSION: 0.3.1
+// VERSION: 0.3.2
 //    DATE: 2019-02-07
 // PURPOSE: Arduino Library for HT16K33 4x7segment display
 //     URL: https://github.com/RobTillaart/HT16K33
@@ -20,12 +20,17 @@
 //  0.2.4   2020-10-10  refactor #5 setDigits() iso suppressLeadingZeroPlaces()
 //  0.3.0   2020-10-12  negative float, cache control, extend displayRaw()
 //  0.3.1   2020-12-28  arduino-CI, unit test (framework only), 
+//  0.3.2   2021-01-14  add WireN suppoprt, 
+//                      add refresh(),                  // experimental
+//                      add getOverflow();              // experimental
+//                      add displayFloat(f, decimals);  // experimental
 
 #include "HT16K33.h"
 
 // Commands
 #define HT16K33_ON              0x21  // 0=off 1=on
 #define HT16K33_STANDBY         0x20  // bit xxxxxxx0
+
 
 // bit pattern 1000 0xxy
 // y    =  display on / off
@@ -37,14 +42,17 @@
 #define HT16K33_BLINKON2HZ      0x83
 #define HT16K33_BLINKOFF        0x81
 
+
 // bit pattern 1110 xxxx
 // xxxx    =  0000 .. 1111 (0 - F)
 #define HT16K33_BRIGHTNESS      0xE0
+
 
 // Special characters
 #define HT16K33_SPACE            16
 #define HT16K33_MINUS            17
 #define HT16K33_NONE             99
+
 
 //
 //  HEX codes 7 segment
@@ -77,26 +85,49 @@ static const uint8_t charmap[] = {  // TODO PROGMEM ?
   0x40,   // minus
 };
 
-////////////////////////////////////////////////////
 
-HT16K33::HT16K33(const uint8_t address)
+////////////////////////////////////////////////////
+//
+// CONSTRUCTOR
+//
+HT16K33::HT16K33(const uint8_t address, TwoWire *wire)
 {
   _addr = address;
+  _wire = wire;
 }
 
+
 #if defined (ESP8266) || defined(ESP32)
-void HT16K33::begin(uint8_t sda, uint8_t scl)
+bool HT16K33::begin(uint8_t sda, uint8_t scl)
 {
-  Wire.begin(sda, scl);
+  _wire = &Wire;
+  if ((sda < 255) && (scl < 255))
+  {
+    _wire->begin(sda, scl);
+  } else {
+    _wire->begin();
+  }
+  if (! isConnected()) return false;
   reset();
+  return true;
 }
 #endif
 
-void HT16K33::begin()
+
+bool HT16K33::begin()
 {
-  Wire.begin();
+  _wire->begin();
+  if (! isConnected()) return false;
   reset();
+  return true;
 }
+
+bool HT16K33::isConnected()
+{
+  _wire->beginTransmission(_addr);
+  return (0 == _wire->endTransmission());
+}
+
 
 void HT16K33::reset()
 {
@@ -107,6 +138,7 @@ void HT16K33::reset()
   brightness(8);
 }
 
+
 void HT16K33::clearCache()
 {
   for (uint8_t i = 0; i < 5; i++)
@@ -115,6 +147,7 @@ void HT16K33::clearCache()
   }
 }
 
+
 void HT16K33::displayOn()
 {
   writeCmd(HT16K33_ON);
@@ -122,17 +155,26 @@ void HT16K33::displayOn()
   brightness(_bright);
 }
 
+
 void HT16K33::displayOff()
 {
   writeCmd(HT16K33_DISPLAYOFF);
   writeCmd(HT16K33_STANDBY);
 }
 
+
+void HT16K33::refresh()
+{
+  _refresh();
+}
+
+
 void HT16K33::blink(uint8_t val)
 {
   if (val > 0x03) val = 0x00;
   writeCmd(HT16K33_BLINKOFF | (val << 1) );
 }
+
 
 void HT16K33::brightness(uint8_t val)
 {
@@ -142,15 +184,18 @@ void HT16K33::brightness(uint8_t val)
   writeCmd(HT16K33_BRIGHTNESS | _bright);
 }
 
+
 void HT16K33::setDigits(uint8_t val)
 {
   _digits = val > 4 ? 4 : val;
 }
 
+
 void HT16K33::suppressLeadingZeroPlaces(uint8_t val)
 {
   _digits = val > 4 ? 0 : 4 - val;
 }
+
 
 //////////////////////////////////////////
 //
@@ -162,6 +207,7 @@ void HT16K33::displayClear()
   display(x);
   displayColon(false);
 }
+
 
 // -999..9999
 // DIV10 & DIV100 optimize?
@@ -197,6 +243,7 @@ void HT16K33::displayInt(int n)
   display(x);
 }
 
+
 // 0000..FFFF
 void HT16K33::displayHex(uint16_t n)
 {
@@ -210,6 +257,7 @@ void HT16K33::displayHex(uint16_t n)
   display(x);
 }
 
+
 // 00.00 .. 99.99
 void HT16K33::displayDate(uint8_t left, uint8_t right)
 {
@@ -221,6 +269,7 @@ void HT16K33::displayDate(uint8_t left, uint8_t right)
   display(x, 1);
   displayColon(false);
 }
+
 
 // 00:00 .. 99:99
 void HT16K33::displayTime(uint8_t left, uint8_t right)
@@ -234,37 +283,42 @@ void HT16K33::displayTime(uint8_t left, uint8_t right)
   displayColon(false);
 }
 
+
 // only 0.000 .. 9999.
-// TODO x.yEz
-void HT16K33::displayFloat(float f)
+void HT16K33::displayFloat(float f, uint8_t decimals)
 {
+  // _overflow = false;
   if (f > 9999 || f < -999 ) 
   {
-    // display overflow ?
+    // _overflow = true;
     return;
   }
   bool neg = (f < 0);
   if (neg) f = -f;
-  int w = f;
 
-  int pt = 3;
-  if (w < 1000) pt = 2; 
-  if (w < 100) pt = 1; 
-  if (w < 10) pt = 0;
+  if (decimals == 2) f = round(f * 100) * 0.01;
+  if (decimals == 1) f = round(f * 10) * 0.1;
+  if (decimals == 0) f = round(f);
+
+  int whole = f;
+  int point = 3;
+  if (whole < 1000) point = 2; 
+  if (whole < 100) point = 1; 
+  if (whole < 10) point = 0;
 
   if (f >= 1)
   {
     while (f < 1000) f *= 10;
-    w = round(f);
+    whole = round(f);
   }
   else
   {
-    w = round(f * 1000);
+    whole = round(f * 1000);
   }
 
   uint8_t x[4], h, l;
-  h = w / 100;
-  l = w - h * 100;
+  h = whole / 100;
+  l = whole - h * 100;
   x[0] = h / 10;
   x[1] = h - x[0] * 10;
   x[2] = l / 10;
@@ -275,10 +329,23 @@ void HT16K33::displayFloat(float f)
     x[2] = x[1];
     x[1] = x[0];
     x[0] = HT16K33_MINUS;
-    pt++;
+    point++;
   }
-  display(x, pt);
+  if (point + decimals < 3)
+  {
+    // add spaces.
+    for (uint8_t n = 3; n > point + decimals; n--) x[n] = HT16K33_SPACE;
+  }
+
+  display(x, point);
 }
+
+
+// void HT16K33::displayFixedPoint(float f, uint8_t pt)
+// {
+  // // TODO
+// }
+
 
 void HT16K33::displayTest(uint8_t del)
 {
@@ -293,6 +360,7 @@ void HT16K33::displayTest(uint8_t del)
   }
 }
 
+
 void HT16K33::displayRaw(uint8_t *arr, bool colon)
 {
   writePos(0, arr[0]);
@@ -301,6 +369,7 @@ void HT16K33::displayRaw(uint8_t *arr, bool colon)
   writePos(4, arr[3]);
   writePos(2, colon ? 255 : 0);
 }
+
 
 void HT16K33::displayVULeft(uint8_t val)
 {
@@ -322,6 +391,7 @@ void HT16K33::displayVULeft(uint8_t val)
   displayRaw(ar);
 }
 
+
 void HT16K33::displayVURight(uint8_t val)
 {
   uint8_t ar[4];
@@ -342,6 +412,7 @@ void HT16K33::displayVURight(uint8_t val)
   displayRaw(ar);
 }
 
+
 void HT16K33::display(uint8_t *arr)
 {
   for (uint8_t i = 0; i < (4 - _digits); i++)
@@ -358,6 +429,7 @@ void HT16K33::display(uint8_t *arr)
   // dumpSerial(arr, 0);
 }
 
+
 void HT16K33::display(uint8_t *arr, uint8_t pnt)
 {
   // debug to Serial
@@ -369,10 +441,12 @@ void HT16K33::display(uint8_t *arr, uint8_t pnt)
   writePos(4, charmap[arr[3]], pnt == 3);
 }
 
+
 void HT16K33::displayColon(uint8_t on)
 {
   writePos(2, on ? 2 : 0);
 }
+
 
 void HT16K33::dumpSerial(uint8_t *arr, uint8_t pnt)
 {
@@ -387,32 +461,48 @@ void HT16K33::dumpSerial(uint8_t *arr, uint8_t pnt)
   Serial.println(pnt);
 }
 
+
 //////////////////////////////////////////////////////////
 //
 // PRIVATE
 //
+void HT16K33::_refresh()
+{
+  for (uint8_t pos = 0; pos < 4; pos++)
+  {
+    _wire->beginTransmission(_addr);
+    _wire->write(pos * 2);
+    _wire->write(_displayCache[pos]);
+    _wire->endTransmission();
+  }
+}
+
 void HT16K33::writeCmd(uint8_t cmd)
 {
-  Wire.beginTransmission(_addr);
-  Wire.write(cmd);
-  Wire.endTransmission();
+  _wire->beginTransmission(_addr);
+  _wire->write(cmd);
+  _wire->endTransmission();
 }
+
 
 void HT16K33::writePos(uint8_t pos, uint8_t mask)
 {
   if (_cache && (_displayCache[pos] == mask)) return;
-  Wire.beginTransmission(_addr);
-  Wire.write(pos * 2);
-  Wire.write(mask);
-  Wire.endTransmission();
+  _wire->beginTransmission(_addr);
+  _wire->write(pos * 2);
+  _wire->write(mask);
+  _wire->endTransmission();
   _displayCache[pos] = _cache ? mask : HT16K33_NONE;
 }
+
 
 void HT16K33::writePos(uint8_t pos, uint8_t mask, bool pnt)
 {
   if (pnt) mask |= 0x80;
+  // if (_overflow) mask |= 0x80;
   else mask &= 0x7F;
   writePos(pos, mask);
 }
+
 
 // -- END OF FILE --
