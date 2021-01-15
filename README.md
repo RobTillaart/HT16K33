@@ -8,6 +8,7 @@
 
 Arduino Library for HT16K33 I2C 4x7segment display
 
+
 ## Description
 
 This library is for the Adafruit 4x7segment display with HT16K33 driver,
@@ -17,6 +18,7 @@ This library is functionally less capable than Adafruits.
 However as it caches the values written to the display per position 
 it is faster for writing on average. The actual gain depends on the
 application and of course the values. 
+
 
 ## Perfomance 
 
@@ -40,6 +42,7 @@ Test on UNO, I2C.setClock(100000);  // version 0.3.0
 0-65535 hexadecimal  24.336 sec
 ```
 
+
 ## Multiple display 
 
 The library supports only one display. Using multiple displays (cascading) e.g. to
@@ -47,7 +50,9 @@ display more than 4 digits must done by the user - see **demo_dual1.ino**.
 With dual display it is important to **setDigits()** for the displays correctly to
 get leading/railing zero's correctly.
 
+
 ## Interface
+
 
 ### Setup behaviour
 
@@ -65,6 +70,7 @@ get leading/railing zero's correctly.
 - **void setDigits(val)** values 0..4, minimal number of digits shown, mandatory for large numbers on dual display.
 - **void suppressLeadingZeroPlaces(val)** obsolete, replaced by setDigits
 
+
 ### Datatypes
 
 - **void displayClear()** empty display
@@ -72,12 +78,15 @@ get leading/railing zero's correctly.
 - **void displayHex(n)** values 0000 .. FFFF
 - **void displayDate(left, right)** values 00.00..99.99 Date could be {month.day} or {day.hour}           . as separator
 - **void displayTime(left, right)** values 00:00..99:99 Time could be hh:mm or mm:ss or ss:uu (hundreds)  : as separator
-- **void displayFloat(f)** values -999..0.000..9999, no overflow indication!
+- **void displayFloat(f, decimals = 3)** values -999..0.000..9999, no overflow indication!  
+The number of decimals = 0,1,2,3 = default. When less decimals are displayed, the number will be right aligned.
+
 
 ### Special
 
 - **void displayVULeft(val)** display used as sort VU meter, values 0..8
 - **void displayVURight(val)** display used as sort VU meter, values 0..8
+
 
 ### Lower level workers
 
@@ -86,10 +95,12 @@ get leading/railing zero's correctly.
 - **void displayColon(on)** 0 = off, all values other are on.
 - **void displayRaw(uint8_t \*arr, colon)** array of 4 bytes to control one 7seg display + colon flag
 
+
 ### Debugging
 
 - **void displayTest(uint8_t del)** debugging / test function
 - **void dumpSerial(uint8_t \*arr, uint8_t pt)** debugging equivalent of display.
+
 
 ## Operation
 
