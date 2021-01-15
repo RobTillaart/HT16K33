@@ -331,10 +331,14 @@ void HT16K33::displayFloat(float f, uint8_t decimals)
     x[0] = HT16K33_MINUS;
     point++;
   }
-  if (point + decimals < 3)
+  // add leading spaces
+  while (point + decimals < 3)
   {
-    // add spaces.
-    for (uint8_t n = 3; n > point + decimals; n--) x[n] = HT16K33_SPACE;
+    x[3] = x[2];
+    x[2] = x[1];
+    x[1] = x[0];
+    x[0] = HT16K33_SPACE;
+    point++;
   }
 
   display(x, point);
