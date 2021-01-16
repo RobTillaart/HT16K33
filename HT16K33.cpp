@@ -48,12 +48,6 @@
 #define HT16K33_BRIGHTNESS      0xE0
 
 
-// Special characters
-#define HT16K33_SPACE            16
-#define HT16K33_MINUS            17
-#define HT16K33_NONE             99
-
-
 //
 //  HEX codes 7 segment
 //
@@ -209,10 +203,10 @@ void HT16K33::displayClear()
 }
 
 
-// -999..9999
 // DIV10 & DIV100 optimize?
-void HT16K33::displayInt(int n)
+bool HT16K33::displayInt(int n)
 {
+  bool inRange = ((-1000 < n) && (n < 10000));
   uint8_t x[4], h, l;
   bool neg = (n < 0);
   if (neg) n = -n;
@@ -241,11 +235,12 @@ void HT16K33::displayInt(int n)
     }
   }
   display(x);
+  return inRange;
 }
 
 
 // 0000..FFFF
-void HT16K33::displayHex(uint16_t n)
+bool HT16K33::displayHex(uint16_t n)
 {
   uint8_t x[4], h, l;
   h = n >> 8;
@@ -255,12 +250,14 @@ void HT16K33::displayHex(uint16_t n)
   x[1] = h & 0x0F;;
   x[0] = h >> 4;
   display(x);
+  return true;
 }
 
 
 // 00.00 .. 99.99
-void HT16K33::displayDate(uint8_t left, uint8_t right)
+bool HT16K33::displayDate(uint8_t left, uint8_t right)
 {
+  bool inRange = ((left < 100) && (right < 100));
   uint8_t x[4];
   x[0] = left / 10;
   x[1] = left - x[0] * 10;
@@ -268,31 +265,38 @@ void HT16K33::displayDate(uint8_t left, uint8_t right)
   x[3] = right - x[2] * 10;
   display(x, 1);
   displayColon(false);
+  return inRange;
 }
 
 
 // 00:00 .. 99:99
-void HT16K33::displayTime(uint8_t left, uint8_t right)
+bool HT16K33::displayTime(uint8_t left, uint8_t right, bool colon)
 {
+  bool inRange = ((left < 100) && (right < 100));
   uint8_t x[4];
   x[0] = left / 10;
   x[1] = left - x[0] * 10;
   x[2] = right / 10;
   x[3] = right - x[2] * 10;
   display(x);
-  displayColon(false);
+  displayColon(colon);
+  return inRange;
 }
 
 
-// only 0.000 .. 9999.
-void HT16K33::displayFloat(float f, uint8_t decimals)
+// seconds / minutes max 6039 == 99:99
+bool HT16K33::displaySeconds(uint16_t seconds, bool colon)
 {
-  // _overflow = false;
-  if (f > 9999 || f < -999 ) 
-  {
-    // _overflow = true;
-    return;
-  }
+  uint8_t left = seconds / 60;
+  uint8_t right = seconds - left * 60;
+  return displayTime(left, right, colon);
+}
+
+
+bool HT16K33::displayFloat(float f, uint8_t decimals)
+{
+  bool inRange = ((-999.5 < f) && (f < 9999.5));
+
   bool neg = (f < 0);
   if (neg) f = -f;
 
@@ -342,14 +346,44 @@ void HT16K33::displayFloat(float f, uint8_t decimals)
   }
 
   display(x, point);
+
+  return inRange;
 }
 
 
-// void HT16K33::displayFixedPoint(float f, uint8_t pt)
-// {
-  // // TODO
-// }
+/////////////////////////////////////////////////////////////////////
+//
+// EXPERIMENTAL
+//
+bool HT16K33::displayFixedPoint0(float f)
+{
+  bool inRange = ((-999.5 < f) && (f < 9999.5));
+  displayFloat(f, 0);
+  return inRange;
+}
 
+bool HT16K33::displayFixedPoint1(float f)
+{
+  bool inRange = ((-99.5 < f) && (f < 999.95));
+  displayFloat(f, 1);
+  return inRange;
+}
+
+bool HT16K33::displayFixedPoint2(float f)
+{
+  bool inRange = ((-9.95 < f) && (f < 99.995));
+  displayFloat(f, 2);
+  return inRange;
+}
+
+bool HT16K33::displayFixedPoint3(float f)
+{
+  bool inRange = ((0 < f) && (f < 9.9995));
+  displayFloat(f, 3);
+  return inRange;
+}
+
+/////////////////////////////////////////////////////////////////////
 
 void HT16K33::displayTest(uint8_t del)
 {
@@ -375,8 +409,9 @@ void HT16K33::displayRaw(uint8_t *arr, bool colon)
 }
 
 
-void HT16K33::displayVULeft(uint8_t val)
+bool HT16K33::displayVULeft(uint8_t val)
 {
+  bool inRange = (val < 9); // can display 0..8  bars
   uint8_t ar[4];
   for (int idx = 3; idx >=0; idx--)
   {
@@ -393,11 +428,13 @@ void HT16K33::displayVULeft(uint8_t val)
     else ar[idx] = 0x00;     //   __
   }
   displayRaw(ar);
+  return inRange;
 }
 
 
-void HT16K33::displayVURight(uint8_t val)
+bool HT16K33::displayVURight(uint8_t val)
 {
+  bool inRange = (val < 9);
   uint8_t ar[4];
   for (uint8_t idx = 0; idx < 4; idx++)
   {
@@ -414,6 +451,7 @@ void HT16K33::displayVURight(uint8_t val)
     else ar[idx] = 0x00;     //   __
   }
   displayRaw(ar);
+  return inRange;
 }
 
 
@@ -460,9 +498,23 @@ void HT16K33::dumpSerial(uint8_t *arr, uint8_t pnt)
     if (arr[i] == HT16K33_SPACE) Serial.print(" ");
     else if (arr[i] == HT16K33_MINUS) Serial.print("-");
     else Serial.print(arr[i]);
+    if (i == pnt) Serial.print(".");
   }
   Serial.print(" ");
   Serial.println(pnt);
+}
+
+
+void HT16K33::dumpSerial()
+{
+  // to debug without display
+  for (int i = 0; i < 4; i++)
+  {
+    if (_displayCache[i] < 0x10) Serial.print("0");
+    Serial.print(_displayCache[i], HEX);
+    Serial.print(" ");
+  }
+  Serial.println();
 }
 
 

@@ -17,6 +17,28 @@
 #define HT16K33_LIB_VERSION         (F("0.3.2"))
 
 
+// Characters
+#define HT16K33_0                0
+#define HT16K33_1                1
+#define HT16K33_2                2
+#define HT16K33_3                3
+#define HT16K33_4                4
+#define HT16K33_5                5
+#define HT16K33_6                6
+#define HT16K33_7                7
+#define HT16K33_8                8
+#define HT16K33_9                9
+#define HT16K33_A                10
+#define HT16K33_B                11
+#define HT16K33_C                12
+#define HT16K33_D                13
+#define HT16K33_E                14
+#define HT16K33_F                15
+#define HT16K33_SPACE            16
+#define HT16K33_MINUS            17
+#define HT16K33_NONE             99
+
+
 class HT16K33
 {
 public:
@@ -36,7 +58,8 @@ public:
   void clearCache();
   void cacheOn()  { _cache = true; };
   void cacheOff() { _cache = false; };
-
+  void refresh(); // force writing of cache to display
+  
   void displayOn();
   void displayOff();
 
@@ -50,37 +73,41 @@ public:
   void suppressLeadingZeroPlaces(uint8_t val);    // will be obsolete
 
   void displayClear();
-  void displayInt(int n);                   // -999 .. 9999
-  void displayHex(uint16_t n);              // 0000 .. FFFF
-
+  bool displayInt(int n);                   // -999 .. 9999
+  bool displayHex(uint16_t n);              // 0000 .. FFFF
 
   // Date could be {month.day} or {day.hour}           . as separator
   // Time could be hh:mm or mm:ss or ss:uu (hundreds   : as separator
-  void displayDate(uint8_t left, uint8_t right);    // 00.00 .. 99.99
-  void displayTime(uint8_t left, uint8_t right);    // 00:00 .. 99:99
+  bool displayDate(uint8_t left, uint8_t right);    // 00.00 .. 99.99
+  bool displayTime(uint8_t left, uint8_t right, bool colon = true);    // 00:00 .. 99:99
+  bool displaySeconds(uint16_t seconds, bool colon = true);    // 00:00 .. 99:99
 
-  void displayFloat(float f, uint8_t decimals = 3); // -999 .. 0.000 .. 9999
+  bool displayFloat(float f, uint8_t decimals = 3); // -999 .. 0.000 .. 9999
 
   void display(uint8_t *arr);               // array with 4 elements
   void display(uint8_t *arr, uint8_t pt);   // pt = digit with . (0..3)
   void displayColon(uint8_t on);            // 0 = off
   void displayRaw(uint8_t *arr, bool colon = false);  // max control
 
-  void displayVULeft(uint8_t val);          // 0..8
-  void displayVURight(uint8_t val);         // 0..8
+  bool displayVULeft(uint8_t val);          // 0..8
+  bool displayVURight(uint8_t val);         // 0..8
 
 
   // DEBUG
   void    displayTest(uint8_t del);
-  void    dumpSerial(uint8_t *arr, uint8_t pnt);
+  void    dumpSerial(uint8_t *arr, uint8_t pnt);  // array as numbers
+  void    dumpSerial();                           // display cache in HEX format
   uint8_t getAddr() { return _addr; };
 
 
   // EXPERIMENTAL
-  void    refresh();
   bool    getOverflow() { return _overflow; };
   void    clrOverflow() { _overflow = false; };
-  // void    displayFixedPoint(float f, uint8_t pt);  // TODO
+
+  bool    displayFixedPoint0(float f);
+  bool    displayFixedPoint1(float f);
+  bool    displayFixedPoint2(float f);
+  bool    displayFixedPoint3(float f);
 
 
 private:
@@ -94,9 +121,11 @@ private:
   bool    _cache = true;
   uint8_t _digits = 0;
   uint8_t _bright;
-  bool    _overflow = false;
 
   TwoWire*  _wire;
+  
+  // EXPERIMENTAL
+  bool    _overflow = false;
 };
 
 // -- END OF FILE --
