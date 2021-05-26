@@ -79,9 +79,9 @@ public:
   // Date could be {month.day} or {day.hour}           . as separator
   // Time could be hh:mm or mm:ss or ss:uu (hundreds   : as separator
   //    colon displays :   lz = Leading Zero or space
-  bool displayDate(uint8_t left, uint8_t right, lz = true);                     // 00.00 .. 99.99
-  bool displayTime(uint8_t left, uint8_t right, bool colon = true, lz = true);  // 00:00 .. 99:99
-  bool displaySeconds(uint16_t seconds, bool colon = true, lz = true);          // 00:00 .. 99:99
+  bool displayDate(uint8_t left, uint8_t right, bool lz = true);                     // 00.00 .. 99.99
+  bool displayTime(uint8_t left, uint8_t right, bool colon = true, bool lz = true);  // 00:00 .. 99:99
+  bool displaySeconds(uint16_t seconds, bool colon = true, bool lz = true);          // 00:00 .. 99:99
 
   bool displayFloat(float f, uint8_t decimals = 3); // -999 .. 0.000 .. 9999
 
