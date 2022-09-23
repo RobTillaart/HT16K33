@@ -120,16 +120,17 @@ These functions are new and still under investigation.
 - **void displayColon(uint8_t on)** 0 = off, all values other are on.
 - **void displayRaw(uint8_t \* array, bool colon)** array of 4 bytes to control one 7seg display + colon flag.
 - **void displayExtraLeds(uint8_t value)** switch on extra leds.
-value is in fact a bit mask see table below.
+value is in fact a bit mask see table below. 0 = all off.
 
 #### Extra Leds table
 
 |  mask  |  description  |
 |:------:|:--------------|
-|   2    | colon.
-|   4    | upper left point, left of the 1st digit.
-|   8    | lower left point, left of the 1st digit.
-|   16   | upper point between 3rd and 4th digit.
+|  0x00  |  all off 
+|  0x02  |  colon.
+|  0x04  |  upper left point, left of the 1st digit.
+|  0x08  |  lower left point, left of the 1st digit.
+|  0x10  |  upper point between 3rd and 4th digit.
 
 ( based upon issue #21 )
 

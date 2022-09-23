@@ -91,9 +91,10 @@ public:
   void displayRaw(uint8_t *array, bool colon = false);  // max control
 
   //  (from issue #21)
-  //  2 = colon
-  //  4 = upper left point, left of the 1st digit
-  //  8 = lower left point, left of the 1st digit
+  //  value = 0 ==> all off.
+  //   2 = colon
+  //   4 = upper left point, left of the 1st digit
+  //   8 = lower left point, left of the 1st digit
   //  16 = upper point between 3rd and 4th digit
   void displayExtraLeds(uint8_t value);
 
