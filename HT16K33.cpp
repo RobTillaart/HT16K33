@@ -29,6 +29,7 @@
 //  0.3.3   2021-05-26  fix #17 add leadingZero flag in displayTIme() [Kudos to OwenDuffy]
 //  0.3.4   2021-12-19  update library.json, license, minor edits
 //  0.3.5   2022-09-23  fix #21 additional LEDs on the display
+//                              used in a special layout   :88:8'8
 
 
 #include "HT16K33.h"

@@ -90,7 +90,7 @@ public:
   void displayColon(uint8_t on);                 // 0 = off
   void displayRaw(uint8_t *array, bool colon = false);  // max control
 
-  //  (from issue #21)
+  //  from issue #21 - used in special layout   :88:8'8   normal = 88:88 or 8.8.8.8
   //  value = 0 ==> all off.
   //   2 = colon
   //   4 = upper left point, left of the 1st digit
