@@ -503,7 +503,7 @@ void HT16K33::displayColon(uint8_t on)
 
 void HT16K33::displayExtraLeds(uint8_t value)
 {
-  if ((value < 2) || (value > 30) || (value & 0x01))
+  if (value > 30)
   {
     return;  //  no leds.
   }
