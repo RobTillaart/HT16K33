@@ -152,7 +152,8 @@ See examples
 
 ## Future
 
-**0.4.0**
+#### 0.4.0
+
 - **bool isDisplayOn()** and similar state functions
   - configuration byte: 4 bits brightness, 1 bit on off flag, 1 bit cache flag, 2 blink rate
 - **void setBrightness()** and **uint8_t getBrightness()**
@@ -160,8 +161,10 @@ See examples
 - **void getDigits()**
 - **FixedPoint()** regular (experimental in 0.3.2)
 - overflow flag ? or not decision
+- move all code to .cpp file
+  - even the small functions.
 
-**unknown**
+#### unknown
 - VU metering using halve bars allows two VU from 0..8   **new**
 - VU metering using halve bars allows one VU from 0..17. extension of current VUleft/right
 - optimize the math if possible - performance and footprint. +float + int division
