@@ -39,6 +39,8 @@
 #define HT16K33_DEGREE           19     //  °
 #define HT16K33_NONE             99
 
+//  P for Pascal / Pressure ?
+//  J for joule?
 
 class HT16K33
 {

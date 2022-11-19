@@ -95,6 +95,10 @@ Optional the colon is set to false (to simulate blink).
 Optional the leading zero (lz) can be replaced by a space to look more natural e.g 1:54  instead of 01:54
 - **bool displayFloat(float f, uint8_t decimals = 3)** values -999..0.000..9999
 The number of decimals = 0,1,2,3 = default. When less decimals are displayed, the number will be right aligned.
+- **bool displayUnit(float f, uint8_t decimals = 2, uint8_t unitChar = HT16K33_SPACE)** values -99..0.000..999
+The number of decimals = 0,1,2 = default. When less decimals are displayed, the number will be right aligned.
+The unitChar is a postFix character like C or F for temperature H for humidity. 
+The unitChar must be one of the chars supported like HT16K33_C, HT16K33_TOP_C or HT16K33_DEGREE (see below).
 
 
 ### Experimental
@@ -144,6 +148,36 @@ value is in fact a bit mask see table below. 0 = all off.
 ### Obsolete
 
 - **void suppressLeadingZeroPlaces(uint8_t value)** obsolete, replaced by setDigits
+
+## Characters supported
+
+from .h file, elaborate
+
+```cpp
+#define HT16K33_0                0
+#define HT16K33_1                1
+#define HT16K33_2                2
+#define HT16K33_3                3
+#define HT16K33_4                4
+#define HT16K33_5                5
+#define HT16K33_6                6
+#define HT16K33_7                7
+#define HT16K33_8                8
+#define HT16K33_9                9
+#define HT16K33_A                10
+#define HT16K33_B                11
+#define HT16K33_C                12
+#define HT16K33_D                13
+#define HT16K33_E                14
+#define HT16K33_F                15
+#define HT16K33_SPACE            16
+#define HT16K33_MINUS            17
+#define HT16K33_TOP_C            18     //  c
+#define HT16K33_DEGREE           19     //  °
+#define HT16K33_NONE             99
+```
+
+If other chars are needed please file an issue.
 
 
 ## Operation
