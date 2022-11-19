@@ -99,9 +99,10 @@ The number of decimals = 0,1,2,3 = default. When less decimals are displayed, th
 The number of decimals = 0,1,2 = default. When less decimals are displayed, the number will be right aligned.
 The unitChar is a postFix character like C or F for temperature H for humidity. 
 The unitChar must be one of the chars supported like HT16K33_C, HT16K33_TOP_C or HT16K33_DEGREE (see below).
+So **displayUnit(25.6, 1, HT16K33_DEGREE)** will display **23.5°**.
 
 
-### Experimental
+### Experimental fixed point
 
 These functions are new and still under investigation.
 
@@ -111,7 +112,7 @@ These functions are new and still under investigation.
 - **bool displayFixedPoint3(float f)** displays values 0.000 .. 9.999 with 3 decimals.
 
 
-### Special
+### Special VU meters
 
 - **bool displayVULeft(uint8_t value)** display used as sort VU meter, values 0..8  Vales > 8 are treated as 8 (but return false).
 - **bool displayVURight(uint8_t value)** display used as sort VU meter, values 0..8 Vales > 8 are treated as 8 (but return false).
@@ -126,7 +127,7 @@ These functions are new and still under investigation.
 - **void displayExtraLeds(uint8_t value)** switch on extra leds.
 value is in fact a bit mask see table below. 0 = all off.
 
-#### Extra Leds table
+#### Extra LEDs table
 
 |  mask  |  description  |
 |:------:|:--------------|
@@ -142,7 +143,9 @@ value is in fact a bit mask see table below. 0 = all off.
 ### Debugging
 
 - **void displayTest(uint8_t del)** debugging / test function.
-- **void dumpSerial(uint8_t \* array, uint8_t point)** debugging equivalent of display.
+- **void dumpSerial(uint8_t \* array, uint8_t point)** debugging equivalent of the display.
+Prints to Serial.
+- **void dumpSerial()** print HEX codes equivalent of the display to Serial.
 
 
 ### Obsolete
