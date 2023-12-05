@@ -142,6 +142,7 @@ private:
   bool    _cache = true;
   uint8_t _digits = 0;
   uint8_t _bright;
+  uint8_t _blink;
 
   TwoWire*  _wire;
 };
