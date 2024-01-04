@@ -141,7 +141,8 @@ So **displayUnit(25.6, 1, HT16K33_DEGREE)** will display **23.5°**.
 - **void displayExtraLeds(uint8_t value)** switch on extra LEDs.
 value is in fact a bit mask see table below. 0 = all off.
 
-When using the consts SEG_A etc from .h file.
+When using the consts SEG_A etc from .h file, for the **displayRaw()**
+one can use the individual segments SEG_A..SEG_G and SEG_DP.
 
 ![layout](https://upload.wikimedia.org/wikipedia/commons/0/02/7_segment_display_labeled.svg "").
 

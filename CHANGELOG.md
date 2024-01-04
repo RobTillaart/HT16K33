@@ -7,8 +7,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
 ## [0.4.1] - 2024-01-04
-- add constants for individual segments
-- add 
+- add constants for individual segments, kudos to DeflateAwning
+- add **demo_scrolling.ino**
+- update readme.md
 
 
 ## [0.4.0] - 2023-12-05
