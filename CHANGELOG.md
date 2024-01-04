@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](http://keepachangelog.com/)
 and this project adheres to [Semantic Versioning](http://semver.org/).
 
 
+## [0.4.1] - 2024-01-04
+- add constants for individual segments
+- add 
+
+
 ## [0.4.0] - 2023-12-05
 - refactor API, begin()
 - update readme.md
