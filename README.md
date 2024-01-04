@@ -143,7 +143,9 @@ value is in fact a bit mask see table below. 0 = all off.
 
 When using the consts SEG_A etc from .h file.
 
-![layout](https://en.wikipedia.org/wiki/File:7_segment_display_labeled.svg "").
+![layout](https://upload.wikimedia.org/wikipedia/commons/0/02/7_segment_display_labeled.svg "").
+
+_Image courtesey wikimedia_
 
 
 #### Extra LEDs table
