@@ -1,5 +1,5 @@
 //
-//    FILE: demo_displayRaw.ino
+//    FILE: demo_scrolling.ino
 //  AUTHOR: Rob Tillaart, DeflateAwning
 // PURPOSE: demo
 //     URL: http://www.adafruit.com/products/1002
