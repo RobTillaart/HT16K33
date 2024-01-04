@@ -44,11 +44,11 @@
 //
 //  HEX codes 7 segment
 //
-//     A               01
-//  F     B        20      02
-//     G               40
-//  E     C        10      04
-//     D    dp         08        80
+//     A               0x01
+//  F     B        0x20    0x02
+//     G               0x40
+//  E     C        0x10    0x04
+//     D    dp         0x08      0x80
 //
 const uint8_t SEG_NONE = 0x00;
 const uint8_t SEG_A    = 0x01;
